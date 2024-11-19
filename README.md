@@ -1,13 +1,21 @@
+ HEAD
 # coinguesser-front
 
-레포지토리의 브랜치 관리
+일단 파일만 올리고 설명은 추가해서 다시 올리겠습니다.
+# flutter_web1
 
-main 브랜치는 항상 배포 가능한 상태를 유지
+A new Flutter project.
 
-develop 브랜치는 기능을 테스트하고 안정화 하는 브랜치
+## Getting Started
 
-feature/* 브랜치 개발자가 새로운 기능을 개발하는 브랜치
+This project is a starting point for a Flutter application.
 
-새로운 기능을 추가할 때 test/ 디렉토리에 자신이 개발한 기능에 대한 feature*.test.js파일도 작성해야함
+A few resources to get you started if this is your first Flutter project:
 
-git action으로 feature 브랜치에서 develop 브랜치로 PR시 자동으로 테스트
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+ 54865bb (Initial commit for feature_web branch)
