@@ -36,7 +36,7 @@
 | `coin`                   | String | 코인 이름                |
 | `data`                   | Array  | 초기 그래프 데이터 배열        |
 | `data[n].time`           | String | 데이터 시간 (예: HH:mm:ss) |
-| `data[n].prediced_value` | Float  | 예측된 값                |
+| `data[n].predicted_value` | Float  | 예측된 값                |
 | `data[n].real_value`     | Float  | 실제 값                 |
 | `latest_prediced_val`    | Float  | 마지막으로 예측된 값 - 5분뒤    |
 
@@ -47,17 +47,17 @@
     "data": [
         {
             "time": "10:05:00",
-            "prediced_value": 124.22,
+            "predicted_value": 124.22,
             "real_value": 126.32
         },
         {
             "time": "10:10:00",
-            "prediced_value": 124.88,
+            "predicted_value": 124.88,
             "real_value": 127.05
         }
         ...
     ],
-    "latest_prediced_val" : 127.99
+    "latest_predicted_val" : 127.99
 }
 ```
 ---
@@ -78,7 +78,7 @@
 | --------------------- | ------ | -------------------- |
 | `coin`                | String | 코인 이름                |
 | `time`                | String | 데이터 시간 (예: HH:mm:ss) |
-| `latest_prediced_val` | Float  | 5분 뒤 예측 값            |
+| `latest_predicted_val` | Float  | 5분 뒤 예측 값            |
 | `real_value`          | Float  | 현재 실제값               |
 
 ##### **응답 데이터 형식**
