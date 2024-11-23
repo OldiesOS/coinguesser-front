@@ -87,9 +87,9 @@
 ##### **응답 데이터 형식**
 - 데이터 스트림(SSE 형식):
 ```plaintext
-data: {"coin":"BTC","time":"10:05:00","prediced_val":124.88, "real_value":126.32}
+data: {"coin":"BTC","time":"10:05:00","predicted_value":124.88, "real_value":126.32}
 
-data: {"coin":"BTC","time":"10:10:00","prediced_val":124.88,"real_value":127.05}
+data: {"coin":"BTC","time":"10:10:00","predicted_value":124.88,"real_value":127.05}
 ```
 ---
 
