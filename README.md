@@ -23,7 +23,7 @@
 - **메서드**: `GET`
 - **설명**:  
     - 요청 시간 기준 1시간
-    - data 개수 12개 마지막 predicted_value 값은 null값으로 날라가도록 구조 변경했습니다다
+    - data 개수 13개 마지막 predicted_value 값은 null값으로 날라가도록 구조 변경했습니다다
 
 #### **요청**
 | 이름          | 위치       | 타입     | 필수 여부 | 설명             |
@@ -87,9 +87,9 @@
 ##### **응답 데이터 형식**
 - 데이터 스트림(SSE 형식):
 ```plaintext
-data: {"coin":"BTC","time":"10:05:00","prediced_val":124.88, "real_value":126.32}
+data: {"coin":"BTC","time":"10:05:00","predicted_value":124.88, "real_value":126.32}
 
-data: {"coin":"BTC","time":"10:10:00","prediced_val":124.88,"real_value":127.05}
+data: {"coin":"BTC","time":"10:10:00","predicted_value":124.88,"real_value":127.05}
 ```
 ---
 
