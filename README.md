@@ -23,7 +23,7 @@
 - **메서드**: `GET`
 - **설명**:  
     - 요청 시간 기준 1시간
-    - data 개수 13개 마지막 predicted_value 값은 null값으로 날라가도록 구조 변경했습니다다
+    - data 개수 13개 마지막 real_value 값은 null값으로 날라가도록 구조 변경했습니다다
 
 #### **요청**
 | 이름          | 위치       | 타입     | 필수 여부 | 설명             |
@@ -35,7 +35,7 @@
 | ------------------------ | ------ | -------------------- |
 | `coin`                   | String | 코인 이름                |
 | `data`                   | Array  | 초기 그래프 데이터 배열        |
-| `data[n].time`           | String | 데이터 시간 (예: HH:mm:ss) |
+| `data[n]._time`           | TIME | 데이터 시간 (예: HH:mm:ss) |
 | `data[n].predicted_value` | Float  | 예측된 값                |
 | `data[n].real_value`     | Float  | 실제 값                 |
 
