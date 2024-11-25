@@ -123,3 +123,35 @@ pubspec.lock
 *.temp
 *.swp
 *.lock
+
+# Flutter
+.dart_tool/
+build/
+
+# iOS
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Pods/
+ios/Podfile.lock
+
+# Android
+.gradle/
+# Uncomment if you have a macOS project
+# macos/.symlinks/
+# Uncomment if you have a Windows project
+# windows/.symlinks/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.iml
+
+# Pubspec lock file (if you don't want to commit it)
+#pubspec.lock
+
+# Log files
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
