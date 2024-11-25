@@ -19,7 +19,7 @@
   
 ## Node.js
 ### **1. 엔드포인트: 초기 데이터 요청**
-- **URL**: `/API/Data/stream/{coin_name}`
+- **URL**: `/API/{coin_name}`
 - **메서드**: `GET`
 - **설명**:  
     - 요청 시간 기준 1시간
@@ -35,7 +35,7 @@
 | ------------------------ | ------ | -------------------- |
 | `coin`                   | String | 코인 이름                |
 | `data`                   | Array  | 초기 그래프 데이터 배열        |
-| `data[n]._time`           | TIME | 데이터 시간 (예: HH:mm:ss) |
+| `data[n]._time`           | String | 데이터 시간 (예: HH:mm:ss) |
 | `data[n].predicted_value` | Float  | 예측된 값                |
 | `data[n].real_value`     | Float  | 실제 값                 |
 
@@ -45,18 +45,18 @@
     "coin": "BTC",
     "data": [
         {
-            "time": "10:05:00",
+            "_time": "10:05:00",
             "predicted_value": 124.22,
             "real_value": 126.32
         },
         {
-            "time": "10:10:00",
+            "_time": "10:10:00",
             "predicted_value": 124.88,
             "real_value": 127.05
         },
         ...
         {
-            "time": "10:10:00",
+            "_time": "10:10:00",
             "predicted_value": 124.88,
             "real_value": null
         }
@@ -65,7 +65,7 @@
 ```
 ---
 ### **2. 엔드포인트: SSE 스트림 요청**
-- **URL**: `/API/Data/stream/{coin_name}`
+- **URL**: `/API/stream/{coin_name}`
 - **메서드**: `GET`
 - **설명**:  
   - 초기 데이터 요청 후, 동일한 엔드포인트에서 SSE 스트림 연결을 시도
@@ -80,16 +80,16 @@
 | 필드명                   | 타입     | 설명                   |
 | --------------------- | ------ | -------------------- |
 | `coin`                | String | 코인 이름                |
-| `time`                | String | 데이터 시간 (예: HH:mm:ss) |
+| `_time`                | String | 데이터 시간 (예: HH:mm:ss) |
 | `predicted_val` | Float  | 5분 뒤 예측 값            |
 | `real_value`          | Float  | 현재 실제값               |
 
 ##### **응답 데이터 형식**
 - 데이터 스트림(SSE 형식):
 ```plaintext
-data: {"coin":"BTC","time":"10:05:00","predicted_value":124.88, "real_value":126.32}
+data: {"coin":"BTC","_time":"10:05:00","predicted_value":124.88, "real_value":126.32}
 
-data: {"coin":"BTC","time":"10:10:00","predicted_value":124.88,"real_value":127.05}
+data: {"coin":"BTC","_time":"10:10:00","predicted_value":124.88,"real_value":127.05}
 ```
 ---
 
