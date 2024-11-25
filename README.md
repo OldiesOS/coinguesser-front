@@ -93,21 +93,3 @@ data: {"coin":"BTC","_time":"10:10:00","predicted_value":124.88,"real_value":127
 ```
 ---
 
-### **3.엔드포인트: 중단 요청**
-- **URL**: `/API/Data/stream/stop`
-- **메서드**: `POST`
-- **설명**:
-    - 현재 클라이언트의 SSE 연결을 종료
-    - 추가적인 본문(body) 데이터 없이 요청만으로 처리
-      
-#### **요청**
-`POST /API/Data/stream/stop HTTP/1.1`
-
-#### **응답 데이터**
-|필드명|타입|설명|
-|---|---|---|
-|`status`|String|중단 처리 결과 메시지.|
-
-##### **응답 예시**
-`{   "status": "Connection successfully stopped." }`
-
