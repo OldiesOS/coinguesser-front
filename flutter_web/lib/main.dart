@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -32,22 +34,33 @@ class PredictionChart extends StatefulWidget {
 }
 
 class _PredictionChartState extends State<PredictionChart> {
-  List<double> actualData = [1.2, 1.5, 1.8, 2.0, 1.9, 2.3, 2.7, 2.5, 3.0, 3.2, 3.1, 3.5];
-  List<double> predictedData = [1.1, 1.4, 1.6, 2.1, 1.7, 2.2, 2.6, 2.4, 2.9, 3.1, 3.3, 3.6, 3.8];
+  List<double> actualData = [];
+  List<double> predictedData = [];
 
-  void updatePrediction() {
-    setState(() {
-      double newActual = actualData.last + (Random().nextBool() ? 1 : -1) * Random().nextDouble();
-      double newPredicted = predictedData.last + (Random().nextBool() ? 1 : -1) * Random().nextDouble();
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
 
-      actualData.add(newActual);
-      predictedData.add(newPredicted);
+  Future<void> fetchData() async {
+    final url = 'http://35.216.20.36:3000/API/xrp'; // API endpoint
+    final response = await http.get(Uri.parse(url));
 
-      if (actualData.length > 12) {
-        actualData.removeAt(0);
-        predictedData.removeAt(0);
-      }
-    });
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print(data);
+
+      // Parse actual and predicted data
+      setState(() {
+        String coin = data['coin'];
+        print(coin);
+        actualData = List<double>.from(data['actual']);
+        predictedData = List<double>.from(data['predicted']);
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
   }
 
   LineChartData getChartData() {
@@ -149,7 +162,9 @@ class _PredictionChartState extends State<PredictionChart> {
                 ),
               ],
             ),
-            child: LineChart(
+            child: actualData.isEmpty || predictedData.isEmpty
+                ? Center(child: CircularProgressIndicator())
+                : LineChart(
               getChartData(),
             ),
           ),
@@ -161,7 +176,7 @@ class _PredictionChartState extends State<PredictionChart> {
         ),
         SizedBox(height: 16),
         ElevatedButton.icon(
-          onPressed: updatePrediction,
+          onPressed: fetchData,  // Manually trigger data refresh
           icon: Icon(Icons.update),
           label: Text('5분 후 예측 업데이트'),
           style: ElevatedButton.styleFrom(
