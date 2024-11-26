@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
 void main() {
   runApp(MyApp());
 }
@@ -36,6 +37,7 @@ class PredictionChart extends StatefulWidget {
 class _PredictionChartState extends State<PredictionChart> {
   List<double> actualData = [];
   List<double> predictedData = [];
+  List<String> timeData = [];
 
   @override
   void initState() {
@@ -51,89 +53,21 @@ class _PredictionChartState extends State<PredictionChart> {
       final data = json.decode(response.body);
       print(data);
 
-      // Parse actual and predicted data
+      // Parse actual, predicted, and time data
       setState(() {
         String coin = data['coin'];
         print(coin);
-        actualData = List<double>.from(data['actual']);
-        predictedData = List<double>.from(data['predicted']);
+
+        // Handle data to exclude null real values for actualData but keep predictedData
+        List<dynamic> filteredData = data['data'];
+
+        actualData = List<double>.from(filteredData.map((item) => item['real_value'] != null ? item['real_value'] : double.nan));
+        predictedData = List<double>.from(filteredData.map((item) => item['predicted_value'] ?? 0.0));
+        timeData = List<String>.from(filteredData.map((item) => item['_time']));
       });
     } else {
       throw Exception('Failed to load data');
     }
-  }
-
-  LineChartData getChartData() {
-    return LineChartData(
-      backgroundColor: Colors.white,
-      minX: 0,
-      maxX: predictedData.length.toDouble() - 1,
-      minY: (actualData + predictedData).reduce(min) - 0.5,
-      maxY: (actualData + predictedData).reduce(max) + 0.5,
-      titlesData: FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            interval: 1,
-            getTitlesWidget: (value, meta) {
-              if (value.toInt() == actualData.length - 1) {
-                return Text('현재');
-              } else if (value.toInt() == predictedData.length - 1) {
-                return Text('예측');
-              } else {
-                return Text('${(value.toInt() + 1) * 5}분');
-              }
-            },
-          ),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            getTitlesWidget: (value, meta) {
-              return Text(value.toStringAsFixed(1));
-            },
-          ),
-        ),
-      ),
-      gridData: FlGridData(show: true),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: Colors.deepPurple),
-      ),
-      lineBarsData: [
-        LineChartBarData(
-          spots: actualData
-              .asMap()
-              .entries
-              .map((e) => FlSpot(e.key.toDouble(), e.value))
-              .toList(),
-          isCurved: true,
-          color: Colors.blue,
-          barWidth: 3,
-          belowBarData: BarAreaData(
-            show: true,
-            color: Colors.blue.withOpacity(0.2),
-          ),
-          dotData: FlDotData(show: true),
-        ),
-        LineChartBarData(
-          spots: predictedData
-              .asMap()
-              .entries
-              .map((e) => FlSpot(e.key.toDouble(), e.value))
-              .toList(),
-          isCurved: true,
-          color: Colors.orange,
-          barWidth: 3,
-          belowBarData: BarAreaData(
-            show: true,
-            color: Colors.orange.withOpacity(0.2),
-          ),
-          dotData: FlDotData(show: true),
-          dashArray: [5, 5],
-        ),
-      ],
-    );
   }
 
   @override
@@ -165,7 +99,7 @@ class _PredictionChartState extends State<PredictionChart> {
             child: actualData.isEmpty || predictedData.isEmpty
                 ? Center(child: CircularProgressIndicator())
                 : LineChart(
-              getChartData(),
+              getChartData(actualData, predictedData, timeData),
             ),
           ),
         ),
@@ -176,7 +110,7 @@ class _PredictionChartState extends State<PredictionChart> {
         ),
         SizedBox(height: 16),
         ElevatedButton.icon(
-          onPressed: fetchData,  // Manually trigger data refresh
+          onPressed: fetchData, // Manually trigger data refresh
           icon: Icon(Icons.update),
           label: Text('5분 후 예측 업데이트'),
           style: ElevatedButton.styleFrom(
@@ -186,4 +120,76 @@ class _PredictionChartState extends State<PredictionChart> {
       ],
     );
   }
+}
+
+LineChartData getChartData(List<double> actualData, List<double> predictedData, List<String> timeData) {
+  return LineChartData(
+    backgroundColor: Colors.white,
+    minX: 0,
+    maxX: timeData.length.toDouble() - 1,
+    minY: (predictedData.where((value) => !value.isNaN).toList() + actualData.where((value) => !value.isNaN).toList()).reduce(min) - 0.5,
+    maxY: (predictedData.where((value) => !value.isNaN).toList() + actualData.where((value) => !value.isNaN).toList()).reduce(max) + 0.5,
+    titlesData: FlTitlesData(
+      bottomTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          interval: 1,
+          getTitlesWidget: (value, meta) {
+            if (value.toInt() >= 0 && value.toInt() < timeData.length) {
+              return Text(timeData[value.toInt()]);
+            } else {
+              return Text('');
+            }
+          },
+        ),
+      ),
+      leftTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          getTitlesWidget: (value, meta) {
+            return Text(value.toStringAsFixed(1));
+          },
+        ),
+      ),
+    ),
+    gridData: FlGridData(show: true),
+    borderData: FlBorderData(
+      show: true,
+      border: Border.all(color: Colors.deepPurple),
+    ),
+    lineBarsData: [
+      LineChartBarData(
+        spots: actualData
+            .asMap()
+            .entries
+            .where((e) => !e.value.isNaN)
+            .map((e) => FlSpot(e.key.toDouble(), e.value))
+            .toList(),
+        isCurved: true,
+        color: Colors.blue,
+        barWidth: 3,
+        belowBarData: BarAreaData(
+          show: true,
+          color: Colors.blue.withOpacity(0.2),
+        ),
+        dotData: FlDotData(show: true),
+      ),
+      LineChartBarData(
+        spots: predictedData
+            .asMap()
+            .entries
+            .map((e) => FlSpot(e.key.toDouble(), e.value))
+            .toList(),
+        isCurved: true,
+        color: Colors.orange,
+        barWidth: 3,
+        belowBarData: BarAreaData(
+          show: true,
+          color: Colors.orange.withOpacity(0.2),
+        ),
+        dotData: FlDotData(show: true),
+        dashArray: [5, 5],
+      ),
+    ],
+  );
 }
