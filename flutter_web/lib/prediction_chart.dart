@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:html';
 
 class PredictionChart extends StatefulWidget {
   final String coinName;
@@ -24,6 +25,17 @@ class _PredictionChartState extends State<PredictionChart> {
     fetchData();
   }
 
+  void connectToSSE(String coinName) {
+    final eventSource = EventSource('http://35.216.20.36:3000/API/stream/$coinName');
+    eventSource.onMessage.listen((event) {
+      print('Received SSE data: ${event.data}');
+    });
+
+    eventSource.onError.listen((error) {
+      print('Error in SSE connection: $error');
+    });
+  }
+
   Future<void> fetchData() async {
     final url = 'http://35.216.20.36:3000/API/${widget.coinName}'; // coinName을 포함
     final response = await http.get(Uri.parse(url));
@@ -41,6 +53,8 @@ class _PredictionChartState extends State<PredictionChart> {
     } else {
       throw Exception('Failed to load data');
     }
+
+    connectToSSE(widget.coinName);
   }
 
   @override
@@ -138,3 +152,5 @@ class _PredictionChartState extends State<PredictionChart> {
     );
   }
 }
+
+
