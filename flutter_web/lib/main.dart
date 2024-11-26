@@ -6,6 +6,19 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final List<String> coinNames = [
+    'BTC',
+    'ETH',
+    'NEO',
+    'MTL',
+    'XRP',
+    'ETC',
+    'SNT',
+    'WAVES',
+    'XEM',
+    'QTUM',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,7 +26,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: PredictionChart(coinName: 'XRP'), // 인자를 전달
+      initialRoute: '/XRP', // 초기 경로 설정
+      routes: {
+        for (String coin in coinNames)
+          '/$coin': (context) => PredictionChart(coinName: coin), // 각 코인에 대한 라우트 생성
+      },
     );
   }
 }
