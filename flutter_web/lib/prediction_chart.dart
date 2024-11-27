@@ -26,35 +26,33 @@ class _PredictionChartState extends State<PredictionChart> {
   }
 
   void connectToSSE(String coinName) {
-    final eventSource = EventSource('http://35.216.20.36:3000/API/stream/$coinName');
+    // final eventSource = EventSource('http://35.216.20.36:3000/API/stream/$coinName');
+    final eventSource = EventSource('http://localhost:3000/API/stream/xrp');
 
     eventSource.onMessage.listen((event) {
       final decodedData = json.decode(event.data);
-
-      // Ping 데이터는 무시
-      if (decodedData == "ping") {
-        print('Ping received, ignoring...');
-        return;
-      }
-
+      // print(decodedData);
+      // if(decodedData['event'] == "ping") print('이것은.. 핑');
       // 조건이 맞지 않으면 데이터를 추가하지 않음
-      if (timeData.isNotEmpty && decodedData['_time'] == timeData.last) {
-        return;
-      }
 
-      // 조건이 맞을 때만 데이터를 추가하고 상태를 갱신
-      setState(() {
-        if (actualData.length >= 12) actualData.removeAt(0);
-        if (predictedData.length >= 13) predictedData.removeAt(0);
-        if (timeData.length >= 13) timeData.removeAt(0);
+      if (decodedData['_time'] != null && // null 확인
+          (timeData.isEmpty || decodedData['_time'] != timeData.last)) {
+        print('Received SSE data: ${event.data}');
 
-        // 새로운 데이터 추가
-        actualData.add(decodedData['real_value'] ?? double.nan);
-        predictedData.add(decodedData['predicted_value'] ?? double.nan);
-        timeData.add(decodedData['_time'] ?? ''); // 시간이 없는 경우 빈 문자열 추가
-      });
+          setState(() {
+            if (actualData.length >= 13) actualData.removeAt(0);
+            if (predictedData.length >= 13) predictedData.removeAt(0);
+            if (timeData.length >= 13) timeData.removeAt(0);
 
-      print('Received SSE data: ${event.data}');
+            actualData.insert(11, decodedData['ex_real_value'] ?? double.nan);
+
+            // 새로운 데이터 추가
+            actualData.add(double.nan);
+            predictedData.add(decodedData['predicted_value'] ?? double.nan);
+            timeData.add(decodedData['_time'] ?? ''); // 시간이 없는 경우 빈 문자열 추가
+          });
+        }
+
     });
 
     eventSource.onError.listen((error) {
@@ -63,12 +61,13 @@ class _PredictionChartState extends State<PredictionChart> {
   }
 
   Future<void> fetchData() async {
-    final url = 'http://35.216.20.36:3000/API/${widget.coinName}';
+    // final url = 'http://35.216.20.36:3000/API/${widget.coinName}';
+    final url = 'http://localhost:3000/API/xrp';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-
+      print(data['data']);
       setState(() {
         actualData = List<double>.from(data['data']
             .map((item) => item['real_value'] != null ? item['real_value'] : double.nan));
@@ -79,7 +78,7 @@ class _PredictionChartState extends State<PredictionChart> {
     } else {
       throw Exception('Failed to load data');
     }
-
+    print(actualData.length);
     connectToSSE(widget.coinName);
   }
 
