@@ -19,16 +19,16 @@ class Coinlist extends StatelessWidget {
 
 class CoinList extends StatelessWidget {
   final List<String> coins = [
-    'A_coin',
-    'B_coin',
-    'C_coin',
-    'D_coin',
-    'E_coin',
-    'F_coin',
-    'G_coin',
-    'H_coin',
-    'I_coin',
-    'L_coin',
+    'BTC',
+    'ETH',
+    'NEO',
+    'MTL',
+    'XRP',
+    'ETC',
+    'SNT',
+    'WAVES',
+    'XEM',
+    'QTUM',
   ];
 
   @override
@@ -42,8 +42,8 @@ class CoinList extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MainPage(coinName: coins[index], url: 'http://google.com'), // 임시로 구글사이트 해둠
-                //builder: (context) => MainPage(coinName: coins[index], url: 'http://35.216.20.36:3000/${coins[index]}'),
+                //builder: (context) => MainPage(coinName: coins[index], url: 'http://google.com'), // 임시로 구글사이트 해둠
+                builder: (context) => MainPage(coinName: coins[index], url: 'http://35.216.20.36:3000/${coins[index]}'),
                 // http://35.216.20.36:3000 << 우리 서버주소 url 에 그래프 url ㄱㄱ 하면 됨
               ),
             );
