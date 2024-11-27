@@ -31,6 +31,12 @@ class _PredictionChartState extends State<PredictionChart> {
     eventSource.onMessage.listen((event) {
       final decodedData = json.decode(event.data);
 
+      // Ping 데이터는 무시
+      if (decodedData == "ping") {
+        print('Ping received, ignoring...');
+        return;
+      }
+
       // 조건이 맞지 않으면 데이터를 추가하지 않음
       if (timeData.isNotEmpty && decodedData['_time'] == timeData.last) {
         return;
