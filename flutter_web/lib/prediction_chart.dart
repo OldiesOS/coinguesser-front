@@ -32,6 +32,7 @@ class _PredictionChartState extends State<PredictionChart> {
       final decodedData = json.decode(event.data);
 
       setState(() {
+        if (timeData.isEmpty || decodedData['_time'] != timeData.last)
         if (actualData.length >= 12) actualData.removeAt(0);
         if (predictedData.length >= 13) predictedData.removeAt(0);
         if (timeData.length >= 13) timeData.removeAt(0);
@@ -40,6 +41,8 @@ class _PredictionChartState extends State<PredictionChart> {
         actualData.add(decodedData['real_value'] ?? double.nan);
         predictedData.add(decodedData['predicted_value'] ?? double.nan);
         timeData.add(decodedData['_time'] ?? ''); // 시간이 없는 경우 빈 문자열 추가
+        print("setState 실행");
+
       });
 
       print('Received SSE data: ${event.data}');
