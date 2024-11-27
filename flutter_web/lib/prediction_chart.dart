@@ -31,6 +31,12 @@ class _PredictionChartState extends State<PredictionChart> {
     eventSource.onMessage.listen((event) {
       final decodedData = json.decode(event.data);
 
+      // 조건이 맞지 않으면 데이터를 추가하지 않음
+      if (timeData.isNotEmpty && decodedData['_time'] == timeData.last) {
+        return;
+      }
+
+      // 조건이 맞을 때만 데이터를 추가하고 상태를 갱신
       setState(() {
         if (actualData.length >= 12) actualData.removeAt(0);
         if (predictedData.length >= 13) predictedData.removeAt(0);
@@ -48,12 +54,10 @@ class _PredictionChartState extends State<PredictionChart> {
     eventSource.onError.listen((error) {
       print('Error in SSE connection: $error');
     });
-
   }
 
-
   Future<void> fetchData() async {
-    final url = 'http://35.216.20.36:3000/API/${widget.coinName}'; // coinName을 포함
+    final url = 'http://35.216.20.36:3000/API/${widget.coinName}';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -95,13 +99,6 @@ class _PredictionChartState extends State<PredictionChart> {
                   ? Center(child: CircularProgressIndicator())
                   : LineChart(getChartData()),
             ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: fetchData,
-              icon: Icon(Icons.update),
-              label: Text('5분 후 예측 업데이트'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            ),
           ],
         ),
       ),
@@ -114,12 +111,10 @@ class _PredictionChartState extends State<PredictionChart> {
       maxX: timeData.length.toDouble() - 1,
       minY: (predictedData.where((value) => !value.isNaN).toList() +
           actualData.where((value) => !value.isNaN).toList())
-          .reduce(min) -
-          0.5,
+          .reduce(min) - 0.5,
       maxY: (predictedData.where((value) => !value.isNaN).toList() +
           actualData.where((value) => !value.isNaN).toList())
-          .reduce(max) +
-          0.5,
+          .reduce(max) + 0.5,
       titlesData: FlTitlesData(
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
@@ -167,5 +162,3 @@ class _PredictionChartState extends State<PredictionChart> {
     );
   }
 }
-
-
