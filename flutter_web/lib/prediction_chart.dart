@@ -26,8 +26,8 @@ class _PredictionChartState extends State<PredictionChart> {
   }
 
   void connectToSSE(String coinName) {
-    // final eventSource = EventSource('http://35.216.20.36:3000/API/stream/$coinName');
-    final eventSource = EventSource('http://localhost:3000/API/stream/xrp');
+    final eventSource = EventSource('http://35.216.20.36:3000/API/stream/$coinName');
+    // final eventSource = EventSource('http://localhost:3000/API/stream/xrp');
 
     eventSource.onMessage.listen((event) {
       final decodedData = json.decode(event.data);
@@ -61,8 +61,8 @@ class _PredictionChartState extends State<PredictionChart> {
   }
 
   Future<void> fetchData() async {
-    // final url = 'http://35.216.20.36:3000/API/${widget.coinName}';
-    final url = 'http://localhost:3000/API/xrp';
+    final url = 'http://35.216.20.36:3000/API/${widget.coinName}';
+    // final url = 'http://localhost:3000/API/xrp';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
