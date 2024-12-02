@@ -27,41 +27,47 @@ class _PredictionChartState extends State<PredictionChart> {
 
   void connectToSSE(String coinName) {
     final eventSource = EventSource('http://35.216.20.36:3000/API/stream/$coinName');
+    // final eventSource = EventSource('http://localhost:3000/API/stream/xrp');
 
     eventSource.onMessage.listen((event) {
       final decodedData = json.decode(event.data);
+      // print(decodedData);
+      // if(decodedData['event'] == "ping") print('이것은.. 핑');
+      // 조건이 맞지 않으면 데이터를 추가하지 않음
 
-      setState(() {
-        if (timeData.isEmpty || decodedData['_time'] != timeData.last)
-        if (actualData.length >= 12) actualData.removeAt(0);
-        if (predictedData.length >= 13) predictedData.removeAt(0);
-        if (timeData.length >= 13) timeData.removeAt(0);
+      if (decodedData['_time'] != null && // null 확인
+          (timeData.isEmpty || decodedData['_time'] != timeData.last)) {
+        print('Received SSE data: ${event.data}');
 
-        // 새로운 데이터 추가
-        actualData.add(decodedData['real_value'] ?? double.nan);
-        predictedData.add(decodedData['predicted_value'] ?? double.nan);
-        timeData.add(decodedData['_time'] ?? ''); // 시간이 없는 경우 빈 문자열 추가
-        print("setState 실행");
+          setState(() {
+            if (actualData.length >= 13) actualData.removeAt(0);
+            if (predictedData.length >= 13) predictedData.removeAt(0);
+            if (timeData.length >= 13) timeData.removeAt(0);
 
-      });
+            actualData.insert(11, decodedData['ex_real_value'] ?? double.nan);
 
-      print('Received SSE data: ${event.data}');
+            // 새로운 데이터 추가
+            actualData.add(double.nan);
+            predictedData.add(decodedData['predicted_value'] ?? double.nan);
+            timeData.add(decodedData['_time'] ?? ''); // 시간이 없는 경우 빈 문자열 추가
+          });
+        }
+
     });
 
     eventSource.onError.listen((error) {
       print('Error in SSE connection: $error');
     });
-
   }
 
-
   Future<void> fetchData() async {
-    final url = 'http://35.216.20.36:3000/API/${widget.coinName}'; // coinName을 포함
+    final url = 'http://35.216.20.36:3000/API/${widget.coinName}';
+    // final url = 'http://localhost:3000/API/xrp';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-
+      print(data['data']);
       setState(() {
         actualData = List<double>.from(data['data']
             .map((item) => item['real_value'] != null ? item['real_value'] : double.nan));
@@ -72,7 +78,7 @@ class _PredictionChartState extends State<PredictionChart> {
     } else {
       throw Exception('Failed to load data');
     }
-
+    print(actualData.length);
     connectToSSE(widget.coinName);
   }
 
@@ -98,13 +104,6 @@ class _PredictionChartState extends State<PredictionChart> {
                   ? Center(child: CircularProgressIndicator())
                   : LineChart(getChartData()),
             ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: fetchData,
-              icon: Icon(Icons.update),
-              label: Text('5분 후 예측 업데이트'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            ),
           ],
         ),
       ),
@@ -117,12 +116,10 @@ class _PredictionChartState extends State<PredictionChart> {
       maxX: timeData.length.toDouble() - 1,
       minY: (predictedData.where((value) => !value.isNaN).toList() +
           actualData.where((value) => !value.isNaN).toList())
-          .reduce(min) -
-          0.5,
+          .reduce(min) - 0.5,
       maxY: (predictedData.where((value) => !value.isNaN).toList() +
           actualData.where((value) => !value.isNaN).toList())
-          .reduce(max) +
-          0.5,
+          .reduce(max) + 0.5,
       titlesData: FlTitlesData(
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
@@ -170,5 +167,3 @@ class _PredictionChartState extends State<PredictionChart> {
     );
   }
 }
-
-
