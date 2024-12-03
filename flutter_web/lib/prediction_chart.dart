@@ -106,14 +106,17 @@ class _PredictionChartState extends State<PredictionChart> {
   }
 
   LineChartData getChartData() {
-    // minY와 maxY를 미리 계산
-    double minY = (predictedData.where((value) => !value.isNaN).toList() +
-        actualData.where((value) => !value.isNaN).toList())
-        .reduce(min) - 0.5;
+    // 각 데이터의 최소 및 최대값 계산
+    double dataMin = (predictedData + actualData)
+        .where((value) => !value.isNaN)
+        .reduce((a, b) => a < b ? a : b);
+    double dataMax = (predictedData + actualData)
+        .where((value) => !value.isNaN)
+        .reduce((a, b) => a > b ? a : b);
 
-    double maxY = (predictedData.where((value) => !value.isNaN).toList() +
-        actualData.where((value) => !value.isNaN).toList())
-        .reduce(max) + 1.0;
+    // 여유 범위 추가
+    double minY = dataMin - (dataMax - dataMin) * 0.1;
+    double maxY = dataMax + (dataMax - dataMin) * 0.1;
 
     return LineChartData(
       minX: 0,
@@ -122,10 +125,10 @@ class _PredictionChartState extends State<PredictionChart> {
       maxY: maxY,
       titlesData: FlTitlesData(
         leftTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false), // 왼쪽 숫자 숨김
+          sideTitles: SideTitles(showTitles: false), // 왼쪽 레이블 숨김
         ),
         topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false), // 윗변 숫자 숨김
+          sideTitles: SideTitles(showTitles: false), // 위쪽 레이블 숨김
         ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
@@ -134,49 +137,33 @@ class _PredictionChartState extends State<PredictionChart> {
             getTitlesWidget: (value, meta) {
               int index = value.toInt();
               if (index >= 0 && index < timeData.length) {
-                String formattedTime = timeData[index].substring(0, 5);
-                return Text(formattedTime);
-              } else {
-                return Text('');
+                return Text(timeData[index].substring(0, 5));
               }
+              return Text('');
             },
           ),
         ),
         rightTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 0.5, // 숫자 간격을 더 넓게 설정
+            interval: (maxY - minY) / 5, // Y축 간격 자동 계산
             reservedSize: 50,
             getTitlesWidget: (value, meta) {
-              // 최하단과 최상단 값을 구합니다.
-              double minValue = minY; // 차트의 최소 y값
-              double maxValue = maxY; // 차트의 최대 y값
-
-              // 현재 값이 최소값 또는 최대값인 경우 숨김
-              if (value == minValue || value == maxValue) {
-                return Text(''); // 빈 문자열 반환으로 해당 레이블 숨김
-              }
-
-              // 최하단과 최상단이 아닌 경우만 레이블을 표시
               return SideTitleWidget(
                 axisSide: meta.axisSide,
-                space: 8, // 텍스트와 축 간의 간격
-                child: RotatedBox(
-                  quarterTurns: 0, // 텍스트를 가로로 유지
-                  child: Text(
-                    '${value.toStringAsFixed(1)} USD', // 텍스트에 USD 추가
-                    style: TextStyle(fontSize: 12, color: Colors.black),
-                    textAlign: TextAlign.center,
-                  ),
+                child: Text(
+                  '${value.toStringAsFixed(2)} USD', // USD 포함
+                  style: TextStyle(fontSize: 12),
                 ),
               );
             },
           ),
         ),
       ),
-
-
-      gridData: FlGridData(show: true),
+      gridData: FlGridData(
+        show: true,
+        horizontalInterval: (maxY - minY) / 5,
+      ),
       borderData: FlBorderData(
         show: true,
         border: Border.all(color: Colors.deepPurple),
@@ -197,6 +184,7 @@ class _PredictionChartState extends State<PredictionChart> {
           spots: predictedData
               .asMap()
               .entries
+              .where((e) => !e.value.isNaN)
               .map((e) => FlSpot(e.key.toDouble(), e.value))
               .toList(),
           isCurved: true,
@@ -207,4 +195,7 @@ class _PredictionChartState extends State<PredictionChart> {
       ],
     );
   }
+
+
+
 }
