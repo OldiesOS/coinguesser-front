@@ -149,6 +149,15 @@ class _PredictionChartState extends State<PredictionChart> {
             interval: (maxY - minY) / 5, // Y축 간격 자동 계산
             reservedSize: 50,
             getTitlesWidget: (value, meta) {
+              // 최하단과 최상단 값을 구합니다.
+              double minValue = minY; // 차트의 최소 y값
+              double maxValue = maxY; // 차트의 최대 y값
+
+              // 현재 값이 최소값 또는 최대값인 경우 숨김
+              if (value == minValue || value == maxValue) {
+                return Text(''); // 빈 문자열 반환으로 해당 레이블 숨김
+              }
+
               return SideTitleWidget(
                 axisSide: meta.axisSide,
                 child: Text(
