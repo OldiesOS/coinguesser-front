@@ -85,11 +85,6 @@ class _PredictionChartState extends State<PredictionChart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.coinName} 5분 단위 예측 차트'),
-        backgroundColor: Colors.deepPurple,
-        centerTitle: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
