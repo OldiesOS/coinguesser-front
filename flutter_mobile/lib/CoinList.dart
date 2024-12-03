@@ -19,16 +19,11 @@ class Coinlist extends StatelessWidget {
 
 class CoinList extends StatelessWidget {
   final List<String> coins = [
-    'BTC',
-    'ETH',
-    'NEO',
-    'MTL',
     'XRP',
+    'ADA',
+    'BTC',
+    'SOL',
     'ETC',
-    'SNT',
-    'WAVES',
-    'XEM',
-    'QTUM',
   ];
 
   @override
