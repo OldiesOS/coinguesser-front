@@ -17,7 +17,7 @@
 # API 명세서 
 -  이거 바탕으로 웹 구현하시면 돼요
   
-## Node.js
+## WEB
 ### **1. 엔드포인트: 초기 데이터 요청**
 - **URL**: `/API/{coin_name}`
 - **메서드**: `GET`
@@ -92,4 +92,42 @@ data: {"coin":"BTC","_time":"10:05:00","predicted_value":124.88, "real_value":12
 data: {"coin":"BTC","_time":"10:10:00","predicted_value":124.88,"real_value":127.05}
 ```
 ---
+
+# Mobile
+### **1. 엔드포인트: SSE 스트림 요청**
+- **URL**: `/API/stream/mobile/{coin_name}`
+- **메서드**: `GET`
+- **설명**:
+    - 초기 데이터 요청 후, 동일한 엔드포인트에서 SSE 스트림 연결을 시도
+    - 연결이 성공하면 서버가 5분마다 새로운 데이터를 `data:` 형식으로 전송
+#### **요청**
+| 이름          | 위치       | 타입     | 필수 여부 | 설명             |
+| ----------- | -------- | ------ | ----- | -------------- |
+| `coin_name` | 경로(Path) | String | 필수    | 코인 이름 (예: BTC) |
+
+#### **응답 데이터 (SSE 스트림)**
+|필드명|타입|설명|
+|---|---|---|
+|`coin`|String|코인 이름|
+|`_time`|String|데이터 시간 (예: HH:mm:ss)|
+|`volume`|Float|거래량|
+|`increase_rate`|Float|현재 가격 대비 상승률|
+
+##### **응답 데이터 형식**
+- 데이터 스트림(SSE 형식):
+```
+data: {"coin":"BTC","_time":"10:05:00","volume":124.88, "increase_rate":126.32}
+
+data: {"coin":"BTC","_time":"10:10:00","volume":124.88,"increase_rate":127.05}
+
+```
+---
+
+### 현재 진행중인 종목
+- 2024-12-03 21:00
+- 완료 : XRP
+- 추가중 : ADA, BTC, SOL
+- 모델 개발 중 : ETH
+
+
 
