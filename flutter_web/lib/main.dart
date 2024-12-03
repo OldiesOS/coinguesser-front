@@ -7,11 +7,14 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final List<String> coinNames = [
-    'ADA',
-    'SOL',
-    'BTC',
     'XRP',
+    'ADA',
+    'BTC',
+    'SOL',
+    'BCH',
+    'BRETT',
     'ETH',
+    'ONDO',
   ];
 
   @override
