@@ -126,8 +126,12 @@ class _PredictionChartState extends State<PredictionChart> {
             showTitles: true,
             interval: 1,
             getTitlesWidget: (value, meta) {
-              if (value.toInt() >= 0 && value.toInt() < timeData.length) {
-                return Text(timeData[value.toInt()]);
+              int index = value.toInt();
+              // 유효한 인덱스 범위인지 확인
+              if (index >= 0 && index < timeData.length) {
+                // 시:분 부분만 추출 (예: "15:30")
+                String formattedTime = timeData[index].substring(0, 5); // "HH:MM" 부분만 추출
+                return Text(formattedTime);
               } else {
                 return Text('');
               }
