@@ -40,9 +40,9 @@ class _PredictionChartState extends State<PredictionChart> {
         print('Received SSE data: ${event.data}');
 
           setState(() {
-            if (actualData.length >= 13) actualData.removeAt(0);
-            if (predictedData.length >= 13) predictedData.removeAt(0);
-            if (timeData.length >= 13) timeData.removeAt(0);
+            if (actualData.length >= 7) actualData.removeAt(0);
+            if (predictedData.length >= 7) predictedData.removeAt(0);
+            if (timeData.length >= 7) timeData.removeAt(0);
 
             actualData.insert(11, decodedData['ex_real_value'] ?? double.nan);
 
@@ -119,22 +119,53 @@ class _PredictionChartState extends State<PredictionChart> {
           .reduce(min) - 0.5,
       maxY: (predictedData.where((value) => !value.isNaN).toList() +
           actualData.where((value) => !value.isNaN).toList())
-          .reduce(max) + 0.5,
+          .reduce(max) + 1.0,
       titlesData: FlTitlesData(
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // 왼쪽 숫자 숨김
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // 윗변 숫자 숨김
+        ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             interval: 1,
             getTitlesWidget: (value, meta) {
-              if (value.toInt() >= 0 && value.toInt() < timeData.length) {
-                return Text(timeData[value.toInt()]);
+              int index = value.toInt();
+              if (index >= 0 && index < timeData.length) {
+                String formattedTime = timeData[index].substring(0, 5);
+                return Text(formattedTime);
               } else {
                 return Text('');
               }
             },
           ),
         ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 0.5, // 숫자 간격 설정
+            reservedSize: 50,
+            getTitlesWidget: (value, meta) {
+              return SideTitleWidget(
+                axisSide: meta.axisSide,
+                space: 8, // 텍스트와 축 간의 간격
+                child: RotatedBox(
+                  quarterTurns: 0, // 텍스트를 가로로 유지
+                  child: Text(
+                    '${value.toStringAsFixed(1)} USD', // 텍스트에 USD 추가
+                    style: TextStyle(fontSize: 12, color: Colors.black),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
+
+
       gridData: FlGridData(show: true),
       borderData: FlBorderData(
         show: true,
