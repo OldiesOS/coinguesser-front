@@ -119,18 +119,22 @@ class _PredictionChartState extends State<PredictionChart> {
           .reduce(min) - 0.5,
       maxY: (predictedData.where((value) => !value.isNaN).toList() +
           actualData.where((value) => !value.isNaN).toList())
-          .reduce(max) + 0.5,
+          .reduce(max) + 1.0,
       titlesData: FlTitlesData(
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // 왼쪽 숫자 숨김
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // 윗변 숫자 숨김
+        ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             interval: 1,
             getTitlesWidget: (value, meta) {
               int index = value.toInt();
-              // 유효한 인덱스 범위인지 확인
               if (index >= 0 && index < timeData.length) {
-                // 시:분 부분만 추출 (예: "15:30")
-                String formattedTime = timeData[index].substring(0, 5); // "HH:MM" 부분만 추출
+                String formattedTime = timeData[index].substring(0, 5);
                 return Text(formattedTime);
               } else {
                 return Text('');
@@ -138,7 +142,30 @@ class _PredictionChartState extends State<PredictionChart> {
             },
           ),
         ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 0.5, // 숫자 간격 설정
+            reservedSize: 50,
+            getTitlesWidget: (value, meta) {
+              return SideTitleWidget(
+                axisSide: meta.axisSide,
+                space: 8, // 텍스트와 축 간의 간격
+                child: RotatedBox(
+                  quarterTurns: 0, // 텍스트를 가로로 유지
+                  child: Text(
+                    '${value.toStringAsFixed(1)} USD', // 텍스트에 USD 추가
+                    style: TextStyle(fontSize: 12, color: Colors.black),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
+
+
       gridData: FlGridData(show: true),
       borderData: FlBorderData(
         show: true,
