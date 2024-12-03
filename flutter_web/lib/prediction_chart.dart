@@ -111,15 +111,20 @@ class _PredictionChartState extends State<PredictionChart> {
   }
 
   LineChartData getChartData() {
+    // minY와 maxY를 미리 계산
+    double minY = (predictedData.where((value) => !value.isNaN).toList() +
+        actualData.where((value) => !value.isNaN).toList())
+        .reduce(min) - 0.5;
+
+    double maxY = (predictedData.where((value) => !value.isNaN).toList() +
+        actualData.where((value) => !value.isNaN).toList())
+        .reduce(max) + 1.0;
+
     return LineChartData(
       minX: 0,
       maxX: timeData.length.toDouble() - 1,
-      minY: (predictedData.where((value) => !value.isNaN).toList() +
-          actualData.where((value) => !value.isNaN).toList())
-          .reduce(min) - 0.5,
-      maxY: (predictedData.where((value) => !value.isNaN).toList() +
-          actualData.where((value) => !value.isNaN).toList())
-          .reduce(max) + 1.0,
+      minY: minY,
+      maxY: maxY,
       titlesData: FlTitlesData(
         leftTitles: AxisTitles(
           sideTitles: SideTitles(showTitles: false), // 왼쪽 숫자 숨김
@@ -145,9 +150,19 @@ class _PredictionChartState extends State<PredictionChart> {
         rightTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 0.5, // 숫자 간격 설정
+            interval: 0.5, // 숫자 간격을 더 넓게 설정
             reservedSize: 50,
             getTitlesWidget: (value, meta) {
+              // 최하단과 최상단 값을 구합니다.
+              double minValue = minY; // 차트의 최소 y값
+              double maxValue = maxY; // 차트의 최대 y값
+
+              // 현재 값이 최소값 또는 최대값인 경우 숨김
+              if (value == minValue || value == maxValue) {
+                return Text(''); // 빈 문자열 반환으로 해당 레이블 숨김
+              }
+
+              // 최하단과 최상단이 아닌 경우만 레이블을 표시
               return SideTitleWidget(
                 axisSide: meta.axisSide,
                 space: 8, // 텍스트와 축 간의 간격
