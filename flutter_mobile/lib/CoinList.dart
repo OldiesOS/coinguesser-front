@@ -41,7 +41,7 @@ class CoinList extends StatelessWidget {
               context,
               MaterialPageRoute(
                 //builder: (context) => MainPage(coinName: coins[index], url: 'http://google.com'), // 임시로 구글사이트 해둠
-                builder: (context) => MainPage(coinName: coins[index], url: 'http://35.216.20.36:3000/#/${coins[index]}'),
+                builder: (context) => MainPage(coinName: coins[index], url: 'http://35.216.127.203:3000/#/${coins[index]}'),
                 // http://35.216.20.36:3000 << 우리 서버주소 url 에 그래프 url ㄱㄱ 하면 됨
               ),
             );

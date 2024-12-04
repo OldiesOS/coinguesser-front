@@ -53,7 +53,7 @@ class _MainPageState extends State<MainPage> {
   void connectToSSE(String coinName) async {
     try {
       final eventSource =
-      await EventSource.connect('http://35.216.20.36:3000/API/stream/mobile/$coinName');
+      await EventSource.connect('http://35.216.127.203:3000/API/stream/mobile/$coinName');
 
       print("SSE connected successfully"); // SSE 연결 성공 확인 로그 추가
 
@@ -76,8 +76,8 @@ class _MainPageState extends State<MainPage> {
                   volume = decodedData.containsKey('volume')
                       ? decodedData['volume'].toString()
                       : 'Unknown';
-                  time = decodedData.containsKey('_time')
-                      ? decodedData['_time'].toString()
+                  time = decodedData.containsKey('time')
+                      ? decodedData['time'].toString()
                       : 'Unknown';
                   increaseRate = decodedData.containsKey('increase_rate')
                       ? decodedData['increase_rate'].toString()
