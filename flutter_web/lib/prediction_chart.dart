@@ -97,13 +97,66 @@ class _PredictionChartState extends State<PredictionChart> {
             Expanded(
               child: actualData.isEmpty || predictedData.isEmpty
                   ? Center(child: CircularProgressIndicator())
-                  : LineChart(getChartData()),
+                  : Stack(
+                children: [
+                  LineChart(getChartData()), // 그래프
+                  Positioned(
+                    bottom: 16, // 그래프 내부의 왼쪽 하단 위치
+                    left: 16,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1), // 투명 흰색 배경
+                        borderRadius: BorderRadius.circular(8), // 모서리 둥글게
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start, // 왼쪽 정렬
+                        children: [
+                          // 파란 선: 현재값
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CustomPaint(
+                                size: Size(40, 2), // 선 길이와 두께
+                                painter: LinePainter(Colors.blue, isDashed: false),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                "현재값",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          // 주황 점선: 예측값
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CustomPaint(
+                                size: Size(40, 2), // 선 길이와 두께
+                                painter: LinePainter(Colors.orange, isDashed: true),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                "예측값",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
+
 
   LineChartData getChartData() {
     // 각 데이터의 최소 및 최대값 계산
@@ -204,7 +257,43 @@ class _PredictionChartState extends State<PredictionChart> {
       ],
     );
   }
-
-
-
 }
+// 커스텀 페인터 클래스
+class LinePainter extends CustomPainter {
+  final Color color;
+  final bool isDashed;
+
+  LinePainter(this.color, {this.isDashed = false});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = size.height // 선 두께
+      ..style = PaintingStyle.stroke;
+
+    if (isDashed) {
+      // 점선 그리기
+      double dashWidth = 5, dashSpace = 5, startX = 0;
+      while (startX < size.width) {
+        canvas.drawLine(
+          Offset(startX, size.height / 2),
+          Offset(startX + dashWidth, size.height / 2),
+          paint,
+        );
+        startX += dashWidth + dashSpace;
+      }
+    } else {
+      // 직선 그리기
+      canvas.drawLine(
+        Offset(0, size.height / 2),
+        Offset(size.width, size.height / 2),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
