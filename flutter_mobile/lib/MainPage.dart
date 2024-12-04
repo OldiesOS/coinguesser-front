@@ -20,6 +20,7 @@ class _MainPageState extends State<MainPage> {
   String volume = 'Loading...';
   String time = 'Loading...';
   String increaseRate = 'Loading...';
+  String updown = 'Loading...'; // 올바른 타입으로 선언
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _MainPageState extends State<MainPage> {
           },
         ),
       )
+      ..enableZoom(true) // 줌 기능 활성화
       ..loadRequest(Uri.parse(widget.url)); // URL을 widget.url에서 불러옴
 
     // connectToSSE 함수 호출
@@ -50,7 +52,8 @@ class _MainPageState extends State<MainPage> {
 
   void connectToSSE(String coinName) async {
     try {
-      final eventSource = await EventSource.connect('http://35.216.20.36:3000/API/stream/mobile/$coinName');
+      final eventSource =
+      await EventSource.connect('http://35.216.20.36:3000/API/stream/mobile/$coinName');
 
       print("SSE connected successfully"); // SSE 연결 성공 확인 로그 추가
 
@@ -70,11 +73,21 @@ class _MainPageState extends State<MainPage> {
               // 수신된 데이터 확인
               if (decodedData != null && decodedData is Map<String, dynamic>) {
                 setState(() {
-                  volume = decodedData.containsKey('volume') ? decodedData['volume'].toString() : 'Unknown';
-                  time = decodedData.containsKey('_time') ? decodedData['_time'].toString() : 'Unknown';
-                  increaseRate = decodedData.containsKey('increase_rate') ? decodedData['increase_rate'].toString() : 'Unknown';
+                  volume = decodedData.containsKey('volume')
+                      ? decodedData['volume'].toString()
+                      : 'Unknown';
+                  time = decodedData.containsKey('_time')
+                      ? decodedData['_time'].toString()
+                      : 'Unknown';
+                  increaseRate = decodedData.containsKey('increase_rate')
+                      ? decodedData['increase_rate'].toString()
+                      : 'Unknown';
+                  updown = decodedData.containsKey('updown')
+                      ? decodedData['updown'].toString()
+                      : 'Unknown';
                 });
-                print("State updated with new data: volume=$volume, time=$time, increaseRate=$increaseRate");
+                print(
+                    "State updated with new data: volume=$volume, time=$time, increaseRate=$increaseRate, updown=$updown");
               } else {
                 print("Invalid data structure: ${event.data}");
               }
@@ -94,7 +107,6 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -103,7 +115,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.coinName),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -112,7 +124,7 @@ class _MainPageState extends State<MainPage> {
             // Name and Date Section
             Container(
               padding: EdgeInsets.all(16.0),
-              color: Colors.purple[100],
+              color: Colors.lightBlue[100],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -131,7 +143,7 @@ class _MainPageState extends State<MainPage> {
 
             // WebView Section for Graph
             Container(
-              height: 500,
+              height: 430,
               width: double.infinity,
               child: WebViewWidget(controller: controller),
             ),
@@ -141,25 +153,120 @@ class _MainPageState extends State<MainPage> {
             // Real-Time Data Display Section
             Container(
               padding: EdgeInsets.all(16.0),
-              color: Colors.purple[50],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              color: Colors.lightBlue[50],
+              child: Table(
+                border: TableBorder.all(color: Colors.blueAccent, width: 1), // 테이블 테두리 추가
                 children: [
-                  Text(
-                    "코인명: ${widget.coinName}",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  TableRow(
+                    decoration: BoxDecoration(color: Colors.lightBlue[100]), // 헤더 색상 지정
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "INFOMATION",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "COIN_GUESSER",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    "거래량: $volume",
-                    style: TextStyle(fontSize: 16),
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "거래량",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          volume,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    "시간: $time",
-                    style: TextStyle(fontSize: 16),
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "시간",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          time,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    "인상률: $increaseRate %",
-                    style: TextStyle(fontSize: 16),
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "인상률",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "$increaseRate %",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "UP/DOWN",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              updown,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: updown == "UP"
+                                    ? Colors.red
+                                    : (updown == "DOWN" ? Colors.blue : Colors.black),
+                              ),
+                            ),
+                            SizedBox(width: 8.0),
+                            Icon(
+                              updown == "UP"
+                                  ? Icons.arrow_upward
+                                  : (updown == "DOWN" ? Icons.arrow_downward : Icons.remove),
+                              color: updown == "UP"
+                                  ? Colors.red
+                                  : (updown == "DOWN" ? Colors.blue : Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

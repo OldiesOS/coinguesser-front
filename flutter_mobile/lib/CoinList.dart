@@ -9,7 +9,7 @@ class Coinlist extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('종목 리스트'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
       body: CoinList(),
@@ -23,7 +23,10 @@ class CoinList extends StatelessWidget {
     'ADA',
     'BTC',
     'SOL',
-    'ETC',
+    'BCH',
+    'BRETT',
+    'ETH',
+    'ONDO',
   ];
 
   @override
